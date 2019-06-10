@@ -12,9 +12,10 @@ luarocks install redux-props
 ## Usage
 ### Handler is a function
 ```lua
-local store = require 'store'
 local ReduxProps = require 'reduxProps'
 local ExampleActions = require 'actions.example'
+
+local store = ...
 
 ReduxProps.bindStore(store)
 
