@@ -38,6 +38,9 @@ disconnect()
 
 ### Handler is an object
 ```lua
+--[[
+    Handler definition.
+--]]
 local Handler = {}
 
 -- Define a props changed handler
@@ -47,12 +50,13 @@ end
 return Handler
 ```
 ```lua
-local store = require 'store'
 local ReduxProps = require 'reduxProps'
 local ExampleActions = require 'actions.example'
 local Handler = require 'handler'
 
-ReduxProps.bind(store)
+local store = ...
+
+ReduxProps.bindStore(store)
 
 local function mapStateToProps(state)
     return {
