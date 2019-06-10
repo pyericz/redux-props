@@ -16,7 +16,7 @@ local store = require 'store'
 local ReduxProps = require 'reduxProps'
 local ExampleActions = require 'actions.example'
 
-ReduxProps.bind(store)
+ReduxProps.bindStore(store)
 
 local function mapStateToProps(state)
     return {
