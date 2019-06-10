@@ -35,13 +35,15 @@ describe('ReduxProps', function ()
 
             local index = 1
             local function handler(prev, next)
+                print('[TITLE]', prev.title, next.title)
+                print('[NUM]', prev.num, next.num)
                 index = index + 1
             end
             local disconnect = ReduxProps.connect(mapStateToProps)(handler)
 
             store.dispatch(Test1Actions.updateTitle('GitHub'))
             assert.is_equal(index, 2)
-            
+
             store.dispatch(Test1Actions.updateUrl('https://github.com'))
             assert.is_equal(index, 2)
 
