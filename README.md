@@ -32,3 +32,6 @@ store.dispatch(ExampleActions.updateUrl('https://github.com'))
 
 disconnect()
 ```
+
+## License
+[MIT License](https://github.com/pyericz/redux-props/blob/master/LICENSE)
