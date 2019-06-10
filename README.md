@@ -4,7 +4,7 @@
 redux-props is useful for handling [redux](https://github.com/pyericz/redux-lua) state changes.
 
 ## Installation
-You can install redux-props using LuaRocks
+You can install redux-props using [LuaRocks](http://luarocks.org/modules/pyericz/redux-props):
 ```
 luarocks install redux-props
 ```
