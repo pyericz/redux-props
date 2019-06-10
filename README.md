@@ -1,4 +1,5 @@
 # redux-props
+[![Build Status](https://api.travis-ci.org/pyericz/redux-props.svg?branch=master)](https://travis-ci.org/pyericz/redux-props)
 
 redux-props is useful for handling [redux](https://github.com/pyericz/redux-lua) state changes.
 
