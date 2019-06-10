@@ -21,7 +21,7 @@ install:
   - luarocks install luacov-coveralls
 
 script:
-  - luacheck --std max+busted spec
+  - luacheck --no-self --std max+busted spec
   - busted --verbose --coverage
 
 branches:
