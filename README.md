@@ -38,9 +38,9 @@ disconnect()
 
 ### Handler is an object
 ```lua
--- Define a props changed handler
 local Handler = {}
 
+-- Define a props changed handler
 function Handler:reduxPropsChanged(prevProps, nextProps)
 end
 
