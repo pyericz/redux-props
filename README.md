@@ -10,6 +10,7 @@ luarocks install redux-props
 ```
 
 ## Usage
+### handler is a function
 ```lua
 local store = require 'store'
 local ReduxProps = require 'reduxProps'
@@ -28,6 +29,37 @@ local function handler(prevProps, nextProps)
 end
 
 local disconnect = ReduxProps.connect(mapStateToProps)(handler)
+
+store.dispatch(ExampleActions.updateUrl('https://github.com'))
+
+disconnect()
+```
+
+### handler is an object
+```
+local Handler = {}
+
+function Handler:reduxPropsChanged(prevProps, nextProps)
+end
+
+return Handler
+```
+```lua
+local store = require 'store'
+local ReduxProps = require 'reduxProps'
+local ExampleActions = require 'actions.example'
+local Handler = require 'handler'
+
+ReduxProps.bind(store)
+
+local function mapStateToProps(state)
+    return {
+        url = state.example.url,
+        flag = state.example.flag
+    }
+end
+
+local disconnect = ReduxProps.connect(mapStateToProps)(Handler)
 
 store.dispatch(ExampleActions.updateUrl('https://github.com'))
 
