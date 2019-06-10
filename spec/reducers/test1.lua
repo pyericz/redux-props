@@ -1,5 +1,4 @@
 local assign = require 'lredux.helpers.assign'
-local inspect = require 'lredux.utils.inspect'
 
 local initState = {
     title = '',
