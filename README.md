@@ -25,6 +25,7 @@ local function mapStateToProps(state)
     }
 end
 
+-- Define a props changed handler
 local function handler(prevProps, nextProps)
 end
 
@@ -36,7 +37,8 @@ disconnect()
 ```
 
 ### handler is an object
-```
+```lua
+-- Define a props changed handler
 local Handler = {}
 
 function Handler:reduxPropsChanged(prevProps, nextProps)
