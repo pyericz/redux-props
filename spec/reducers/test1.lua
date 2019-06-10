@@ -1,5 +1,5 @@
 local assign = require 'lredux.helpers.assign'
-local Null = require 'lredux.null'
+local inspect = require 'lredux.utils.inspect'
 
 local initState = {
     title = '',
@@ -10,27 +10,27 @@ local initState = {
 
 local handlers = {
     ['TEST1_UPDATE_TITLE'] = function(state, action)
-        return assign(initState, state, {
+        return assign({}, initState, state, {
             title = action.title
         })
     end,
     ['TEST1_UPDATE_URL'] = function(state, action)
-        return assign(initState, state, {
+        return assign({}, initState, state, {
             url = action.url
         })
     end,
     ['TEST1_UPDATE_NUM'] = function(state, action)
-        return assign(initState, state, {
+        return assign({}, initState, state, {
             num = action.num
         })
     end,
     ['TEST1_UPDATE_FLAG'] = function(state, action)
-        return assign(initState, state, {
+        return assign({}, initState, state, {
             flag = action.flag
         })
     end,
     ['TEST1_DONE'] = function()
-        return Null
+        return assign({}, initState)
     end
 }
 
