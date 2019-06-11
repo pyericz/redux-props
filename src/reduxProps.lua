@@ -1,5 +1,16 @@
 local ReduxProps = {}
 
+local function assign(target, ...)
+    local args = {...}
+    for i=1, #args do
+        local tbl = args[i] or {}
+        for k, v in pairs(tbl) do
+            target[k] = v
+        end
+    end
+    return target
+end
+
 function ReduxProps.bindStore(store)
     if type(store) ~= 'table' and store ~= nil then
         error('Unknown store type')
@@ -26,31 +37,40 @@ local function isPropsChanged(prevProps, nextProps)
     return false
 end
 
-local function handlerCall(handler, prevProps, nextProps)
-    if type(handler) == 'function' then
-        handler(prevProps, nextProps)
-    elseif type(handler) == 'table' then
-        if type(handler.reduxPropsChanged) == 'function' then
-            handler:reduxPropsChanged(prevProps, nextProps)
-        end
-    end
-end
-
 function ReduxProps.connect(mapStateToProps)
     local store = ReduxProps.store
     return function (handler)
+
         if store == nil then
-            return function () end
+            return handler
         end
-        local prevProps = mapStateToProps(store.getState())
+        if type(handler) ~= 'table' then
+            return handler
+        end
+        if type(handler.reduxPropsChanged) ~= 'function' then
+            return handler
+        end
+
+        local prevProps = mapStateToProps(store.getState(), handler.props)
+        handler.props = assign({}, handler.props, prevProps)
+
         local function stateChanged()
-            local nextProps = mapStateToProps(store.getState())
+            local nextProps = mapStateToProps(store.getState(), handler.props)
             if isPropsChanged(prevProps, nextProps) then
-                handlerCall(handler, prevProps, nextProps)
+                handler:reduxPropsChanged(prevProps, nextProps)
+                handler.props = assign({}, handler.props, nextProps)
                 prevProps = nextProps
             end
         end
-        return store.subscribe(stateChanged)
+        local destroy = handler.destroy
+        local unsubscribe = store.subscribe(stateChanged)
+        handler.destroy = function (...)
+            unsubscribe()
+            if type(destroy) == 'function' then
+                destroy(...)
+            end
+        end
+        return handler
     end
 end
 
