@@ -16,7 +16,7 @@ Define componet:
     File: components/handler.lua
 --]]
 local Component = require 'redux-props.component'
-local Handler = Component:extend()
+local Handler = Component:extends()
 
 function Handler:constructor(props)
     Component.constructor(Handler, props)
