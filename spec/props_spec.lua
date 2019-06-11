@@ -31,7 +31,8 @@ describe('ReduxProps', function ()
         it('connect with object', function ()
             Provider.setStore(store)
 
-            local function mapStateToProps(state)
+            local function mapStateToProps(state, ownProps)
+                print('ownProps.........', inspect(ownProps))
                 local test1 = state.test1 or {}
                 return {
                     title = test1.title,
@@ -40,11 +41,16 @@ describe('ReduxProps', function ()
             end
 
             local index = 1
-            local Handler = Component:extend()
+            local Handler = Component:extends()
 
-            function Handler:reduxPropsChanged(prev, next)
-                print('Handler:reduxPropsChanged', inspect(prev), inspect(next))
+            function Handler:reduxPropsWillChange(prev, next)
+                print('Handler:reduxPropsWillChange', inspect(prev), inspect(next))
+                print('self.props', inspect(self.props))
                 index = index + 1
+            end
+
+            function Handler:reduxPropsChanged()
+                print('Handler:reduxPropsChanged', inspect(self.props))
             end
 
             local container = connect(mapStateToProps)(Handler)

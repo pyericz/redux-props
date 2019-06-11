@@ -1,10 +1,13 @@
 local Component = {}
 
 function Component:constructor(props)
-    self.props = props
+    local propsType = type(props)
+    assert(propsType == 'table' or propsType == 'nil',
+        string.format('invalid props type (a %s value)', propsType))
+    self.props = props or {}
 end
 
-function Component:extend()
+function Component:extends()
     local class = {}
     setmetatable(class, self)
     self.__index = self
@@ -13,8 +16,11 @@ end
 
 function Component:new(props)
     local obj = {}
-    obj.extend = function ()
-        error('attempt to extend from an instance')
+    obj.extends = function ()
+        error('attempt to extends from an instance')
+    end
+    obj.new = function ()
+        error('attempt to create instance from an instance')
     end
     setmetatable(obj, self)
     self.__index = self
@@ -22,9 +28,14 @@ function Component:new(props)
     return obj
 end
 
-function Component:reduxPropsChanged(prevProps, nextProps)
+function Component:reduxPropsWillChange(prevProps, nextProps)
     -- suppress luacheck warning
     local _, _, _ = self, prevProps, nextProps
+end
+
+function Component:reduxPropsChanged()
+    -- suppress luacheck warning
+    local _ = self
 end
 
 function Component:destroy()

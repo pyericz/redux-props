@@ -1,7 +1,7 @@
 local directory = (...):match("(.-)[^%.]+$")
 local Provider = require(directory..'provider')
 
-local function assign(target, ...)
+local function assign (target, ...)
     local args = {...}
     for i=1, #args do
         local tbl = args[i] or {}
@@ -15,8 +15,9 @@ end
 local function isComponent(comp)
     if type(comp) ~= 'table' then return false end
     if type(comp.constructor) ~= 'function' then return false end
-    if type(comp.extend) ~= 'function' then return false end
+    if type(comp.extends) ~= 'function' then return false end
     if type(comp.new) ~= 'function' then return false end
+    if type(comp.reduxPropsWillChange) ~= 'function' then return false end
     if type(comp.reduxPropsChanged) ~= 'function' then return false end
     if type(comp.destroy) ~= 'function' then return false end
     return true
@@ -50,14 +51,16 @@ local function connect(mapStateToProps)
 
         return function (props)
             local obj = comp:new(props)
-            local prevProps = mapStateToProps(store.getState(), obj.props)
+            local prevProps = mapStateToProps(store.getState(), props)
             obj.props = assign({}, obj.props, prevProps)
 
             local function stateChanged()
-                local nextProps = mapStateToProps(store.getState(), obj.props)
+                local nextProps = mapStateToProps(store.getState(), props)
                 if isPropsChanged(prevProps, nextProps) then
-                    obj:reduxPropsChanged(prevProps, nextProps)
-                    obj.props = assign({}, obj.props, nextProps)
+                    local newProps = assign({}, obj.props, nextProps)
+                    obj:reduxPropsWillChange(obj.props, newProps)
+                    obj.props = newProps
+                    obj:reduxPropsChanged()
                     prevProps = nextProps
                 end
             end
