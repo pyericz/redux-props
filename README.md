@@ -10,10 +10,10 @@ luarocks install redux-props
 ```
 
 ## Usage
+Define componet:
 ```lua
 --[[
-    File: components/hanlder.lua
-    Handler component definition.
+    File: components/handler.lua
 --]]
 local Component = require 'redux-props.component'
 local Handler = Component:extend()
@@ -24,21 +24,24 @@ function Handler:constructor(props)
 end
 
 -- Define a props changed handler
-function Handler:reduxPropsChanged(prevProps, nextProps)
+function Handler:reduxPropsWillChange(prevProps, nextProps)
+    -- handle props will change
+end
+
+function Handler:reduxPropsChanged()
     -- handle props changed
 end
 
 return Handler
 ```
 
+Define container:
 ```lua
-local Provider = require 'redux-props.provider'
-local ExampleActions = require 'actions.example'
+--[[
+    File: containers/handler.lua
+--]]
+local connect = require 'redux-props.connect'
 local handlerComp = require 'components.handler'
-
-local store = ...
-
-Provider.setStore(store)
 
 -- `ownProps` is optional
 local function mapStateToProps(state, ownProps)
@@ -48,11 +51,22 @@ local function mapStateToProps(state, ownProps)
     }
 end
 
-local handlerContainer = connect(mapStateToProps)(handlerComp)
+return connect(mapStateToProps)(handlerComp)
+```
+
+Test dispatching:
+```lua
+local Provider = require 'redux-props.provider'
+local ExampleActions = require 'actions.example'
+local Handler = require 'container.handler'
+
+local store = ...
+
+Provider.setStore(store)
 
 -- create handler instance with initial props.
 local props = {}
-local handler = handlerContainer(props)
+local handler = Handler(props)
 
 store.dispatch(ExampleActions.updateUrl('https://github.com'))
 
