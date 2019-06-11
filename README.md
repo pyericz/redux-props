@@ -12,24 +12,33 @@ luarocks install redux-props
 ## Usage
 ```lua
 --[[
-    Handler definition.
+    File: components/hanlder.lua
+    Handler component definition.
 --]]
-local Handler = {}
+local Component = require 'redux-props.component'
+local Handler = Component:extend()
+
+function Handler:constructor(props)
+    Component.constructor(Handler, props)
+    -- something else
+end
 
 -- Define a props changed handler
 function Handler:reduxPropsChanged(prevProps, nextProps)
+    -- handle props changed
 end
 
 return Handler
 ```
+
 ```lua
-local ReduxProps = require 'reduxProps'
+local Provider = require 'redux-props.provider'
 local ExampleActions = require 'actions.example'
-local handler = require 'handler'
+local handlerComp = require 'components.handler'
 
 local store = ...
 
-ReduxProps.bindStore(store)
+Provider.setStore(store)
 
 -- `ownProps` is optional
 local function mapStateToProps(state, ownProps)
@@ -39,11 +48,16 @@ local function mapStateToProps(state, ownProps)
     }
 end
 
-local container = ReduxProps.connect(mapStateToProps)(handler)
+local handlerContainer = connect(mapStateToProps)(handlerComp)
+
+-- create handler instance with initial props.
+local props = {}
+local handler = handlerContainer(props)
 
 store.dispatch(ExampleActions.updateUrl('https://github.com'))
 
-container:destroy()
+-- don't forget to call `destroy` before handler is destroyed.
+handler:destroy()
 ```
 
 ## License

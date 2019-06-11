@@ -1,4 +1,6 @@
-local ReduxProps = require 'src.reduxProps'
+local connect = require 'src.connect'
+local Component = require 'src.component'
+local Provider = require 'src.provider'
 local reducers = require 'spec.reducers.index'
 local createStore = require 'lredux.createStore'
 local Test1Actions = require 'spec.actions.test1'
@@ -10,24 +12,24 @@ describe('ReduxProps', function ()
     describe('store', function ()
         it('bind store', function ()
             assert.has_error(function()
-                ReduxProps.bindStore(function() end)
+                Provider.setStore(function() end)
             end)
             assert.has_error(function()
-                ReduxProps.bindStore({})
+                Provider.setStore({})
             end)
             assert.has_error(function()
-                ReduxProps.bindStore(1)
+                Provider.setStore(1)
             end)
             assert.has_no.errors(function()
-                ReduxProps.bindStore(store)
+                Provider.setStore(store)
             end)
             assert.has_no.errors(function()
-                ReduxProps.bindStore(nil)
+                Provider.setStore(nil)
             end)
         end)
 
         it('connect with object', function ()
-            ReduxProps.bindStore(store)
+            Provider.setStore(store)
 
             local function mapStateToProps(state)
                 local test1 = state.test1 or {}
@@ -38,17 +40,15 @@ describe('ReduxProps', function ()
             end
 
             local index = 1
-            local Handler = {}
+            local Handler = Component:extend()
 
-            Handler.props = {
-                x = 3
-            }
             function Handler:reduxPropsChanged(prev, next)
                 print('Handler:reduxPropsChanged', inspect(prev), inspect(next))
                 index = index + 1
             end
 
-            local HandlerContainer = ReduxProps.connect(mapStateToProps)(Handler)
+            local container = connect(mapStateToProps)(Handler)
+            local instance = container()
 
             store.dispatch(Test1Actions.updateTitle('GitHub'))
             assert.is_equal(index, 2)
@@ -68,8 +68,8 @@ describe('ReduxProps', function ()
             store.dispatch(Test1Actions.updateUrl('https://redux.js.org'))
             assert.is_equal(index, 4)
 
-            HandlerContainer:destroy()
-            ReduxProps.bindStore(nil)
+            instance:destroy()
+            Provider.setStore(nil)
         end)
     end)
 end)
