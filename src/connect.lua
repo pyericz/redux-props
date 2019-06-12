@@ -1,16 +1,5 @@
 local directory = (...):match("(.-)[^%.]+$")
-local Provider = require(directory..'provider')
-
-local function assign (target, ...)
-    local args = {...}
-    for i=1, #args do
-        local tbl = args[i] or {}
-        for k, v in pairs(tbl) do
-            target[k] = v
-        end
-    end
-    return target
-end
+local Provider = require(directory .. 'provider')
 
 local function isComponent(comp)
     if type(comp) ~= 'table' then return false end
@@ -21,28 +10,6 @@ local function isComponent(comp)
     if type(comp.reduxPropsChanged) ~= 'function' then return false end
     if type(comp.destroy) ~= 'function' then return false end
     return true
-end
-
-local function isPropsChanged(prevProps, nextProps)
-    for k,v in pairs(prevProps) do
-        if nextProps[k] ~= v then
-            return true
-        end
-    end
-    for k,v in pairs(nextProps) do
-        if prevProps[k] ~= v then
-            return true
-        end
-    end
-    return false
-end
-
-local function handleNextProps(object, nextProps, comparison)
-    if comparison and not isPropsChanged(object.props, nextProps) then return end
-
-    object:reduxPropsWillChange(object.props, nextProps)
-    object.props = nextProps
-    object:reduxPropsChanged()
 end
 
 local function connect(mapStateToProps, mapDispatchToProps)
@@ -70,11 +37,7 @@ local function connect(mapStateToProps, mapDispatchToProps)
                 stateProps = mapStateToProps(store.getState(), ownProps)
             end
 
-            handleNextProps(
-                obj,
-                assign({}, ownProps, stateProps, dispatchProps),
-                true
-            )
+            obj:setReduxProps(stateProps, dispatchProps)
 
             if type(mapStateToProps) ~= 'function' then
                 -- we don't need to handle state changes any more
@@ -82,12 +45,9 @@ local function connect(mapStateToProps, mapDispatchToProps)
             end
 
             local function stateChanged()
-                local nextStateProps = mapStateToProps(store.getState(), ownProps)
-                if isPropsChanged(stateProps, nextStateProps) then
-                    local nextProps = assign({}, ownProps, nextStateProps, dispatchProps)
-                    handleNextProps(obj, nextProps, false)
-                    stateProps = nextStateProps
-                end
+                ownProps = obj:getOwnProps()
+                stateProps = mapStateToProps(store.getState(), ownProps)
+                obj:setReduxProps(stateProps, dispatchProps)
             end
 
             -- wrap `destroy` function to call `unsubscribe` function

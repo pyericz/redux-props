@@ -1,3 +1,39 @@
+local function assign(target, ...)
+    local args = {...}
+    for i=1, #args do
+        local tbl = args[i] or {}
+        for k, v in pairs(tbl) do
+            target[k] = v
+        end
+    end
+    return target
+end
+
+local function isPropsChanged(prevProps, nextProps)
+    for k,v in pairs(prevProps) do
+        if nextProps[k] ~= v then
+            return true
+        end
+    end
+    for k,v in pairs(nextProps) do
+        if prevProps[k] ~= v then
+            return true
+        end
+    end
+    return false
+end
+
+
+-- private
+local function applyProps(self, props)
+    if isPropsChanged(self.props, props) then
+        self:reduxPropsWillChange(self.props, props)
+        self.props = props
+        self:reduxPropsChanged()
+    end
+end
+
+
 local Component = {}
 
 local function suppressWarning()
@@ -5,10 +41,8 @@ local function suppressWarning()
 end
 
 function Component:constructor(props)
-    local propsType = type(props)
-    assert(propsType == 'table' or propsType == 'nil',
-        string.format('invalid props type (a %s value)', propsType))
-    self.props = props or {}
+    self.props = props
+    self.ownProps = props
 end
 
 function Component:extends()
@@ -28,7 +62,14 @@ function Component:new(props)
     end
     setmetatable(obj, self)
     self.__index = self
+
+    local propsType = type(props)
+    assert(propsType == 'table' or propsType == 'nil',
+        string.format('invalid props type (a %s value)', propsType))
+
+    props = assign({}, props)
     obj:constructor(props)
+
     return obj
 end
 
@@ -42,6 +83,28 @@ end
 
 function Component:destroy()
     suppressWarning(self)
+end
+
+function Component:setReduxProps(stateProps, dispatchProps)
+    local props = assign({}, self.ownProps, stateProps, dispatchProps)
+    applyProps(self, props)
+end
+
+function Component:updateProps(props)
+    local propsType = type(props)
+    assert(propsType == 'table', string.format('props is not a table (a %s value)', propsType))
+
+    for k,_ in pairs(self.ownProps) do
+        if props[k] then
+            self.ownProps[k] = props[k]
+        end
+    end
+    local fullProps = assign({}, self.props, props)
+    applyProps(self, fullProps)
+end
+
+function Component:getOwnProps()
+    return self.ownProps
 end
 
 return Component
