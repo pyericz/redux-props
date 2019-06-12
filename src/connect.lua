@@ -72,7 +72,7 @@ local function connect(mapStateToProps, mapDispatchToProps)
 
             handleNextProps(
                 obj,
-                assign({}, obj.props, stateProps, dispatchProps),
+                assign({}, ownProps, stateProps, dispatchProps),
                 true
             )
 
@@ -84,7 +84,7 @@ local function connect(mapStateToProps, mapDispatchToProps)
             local function stateChanged()
                 local nextStateProps = mapStateToProps(store.getState(), ownProps)
                 if isPropsChanged(stateProps, nextStateProps) then
-                    local nextProps = assign({}, obj.props, nextStateProps)
+                    local nextProps = assign({}, ownProps, nextStateProps, dispatchProps)
                     handleNextProps(obj, nextProps, false)
                     stateProps = nextStateProps
                 end
