@@ -37,7 +37,7 @@ local function isPropsChanged(prevProps, nextProps)
     return false
 end
 
-local function connect(mapStateToProps)
+local function connect(mapStateToProps, mapDispatchToProps)
     local store = Provider.store
     return function (comp)
 
@@ -49,19 +49,30 @@ local function connect(mapStateToProps)
             return errFunc
         end
 
-        return function (props)
-            local obj = comp:new(props)
-            local prevProps = mapStateToProps(store.getState(), props)
-            obj.props = assign({}, obj.props, prevProps)
+        return function (ownProps)
+            local obj = comp:new(ownProps)
+
+            local dispatchProps = {}
+            if type(mapDispatchToProps) == 'function' then
+                dispatchProps = mapDispatchToProps(store.dispatch, ownProps)
+            end
+
+            if type(mapStateToProps) ~= 'function' then
+                obj.props = assign({}, obj.props, dispatchProps)
+                return obj
+            end
+
+            local stateProps = mapStateToProps(store.getState(), ownProps)
+            obj.props = assign({}, obj.props, stateProps, dispatchProps)
 
             local function stateChanged()
-                local nextProps = mapStateToProps(store.getState(), props)
-                if isPropsChanged(prevProps, nextProps) then
-                    local newProps = assign({}, obj.props, nextProps)
-                    obj:reduxPropsWillChange(obj.props, newProps)
-                    obj.props = newProps
+                local nextStateProps = mapStateToProps(store.getState(), ownProps)
+                if isPropsChanged(stateProps, nextStateProps) then
+                    local nextProps = assign({}, obj.props, nextStateProps)
+                    obj:reduxPropsWillChange(obj.props, nextProps)
+                    obj.props = nextProps
                     obj:reduxPropsChanged()
-                    prevProps = nextProps
+                    stateProps = nextStateProps
                 end
             end
             local destroy = obj.destroy
