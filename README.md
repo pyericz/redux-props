@@ -44,6 +44,7 @@ Define container:
 --]]
 local connect = require 'redux-props.connect'
 local handlerComp = require 'components.handler'
+local Actions = require 'actions'
 
 -- `ownProps` is optional
 local function mapStateToProps(state, ownProps)
@@ -53,7 +54,25 @@ local function mapStateToProps(state, ownProps)
     }
 end
 
-return connect(mapStateToProps)(handlerComp)
+-- `ownProps` is optional
+local function mapDispatchToProps(dispatch, ownProps)
+    local props = {}
+    function props.updateUrl(url)
+        return dispatch(Actions.updateUrl(url))
+    end
+
+    function props.updateFlag(flag)
+        return dispatch(Actions.updateFlag(flag))
+    end
+
+    return props
+end
+
+
+return connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(handlerComp)
 ```
 
 Test dispatching:
