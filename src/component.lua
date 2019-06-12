@@ -1,5 +1,9 @@
 local Component = {}
 
+local function suppressWarning()
+    -- suppress luacheck warnings
+end
+
 function Component:constructor(props)
     local propsType = type(props)
     assert(propsType == 'table' or propsType == 'nil',
@@ -29,18 +33,15 @@ function Component:new(props)
 end
 
 function Component:reduxPropsWillChange(prevProps, nextProps)
-    -- suppress luacheck warning
-    local _, _, _ = self, prevProps, nextProps
+    suppressWarning(self, prevProps, nextProps)
 end
 
 function Component:reduxPropsChanged()
-    -- suppress luacheck warning
-    local _ = self
+    suppressWarning(self)
 end
 
 function Component:destroy()
-    -- suppress luacheck warning
-    local _ = self
+    suppressWarning(self)
 end
 
 return Component
