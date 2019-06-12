@@ -1,4 +1,4 @@
-local assign = require 'lredux.helpers.assign'
+local assign = require 'redux.helpers.assign'
 
 local initState = {
     title = '',

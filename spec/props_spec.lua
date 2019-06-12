@@ -2,9 +2,9 @@ local connect = require 'src.connect'
 local Component = require 'src.component'
 local Provider = require 'src.provider'
 local reducers = require 'spec.reducers.index'
-local createStore = require 'lredux.createStore'
+local createStore = require 'redux.createStore'
 local Test1Actions = require 'spec.actions.test1'
-local inspect = require 'lredux.utils.inspect'
+local inspect = require 'redux.utils.inspect'
 
 local store = createStore(reducers)
 
