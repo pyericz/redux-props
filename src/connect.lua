@@ -37,6 +37,14 @@ local function isPropsChanged(prevProps, nextProps)
     return false
 end
 
+local function handleNextProps(object, nextProps, comparison)
+    if comparison and not isPropsChanged(object.props, nextProps) then return end
+
+    object:reduxPropsWillChange(object.props, nextProps)
+    object.props = nextProps
+    object:reduxPropsChanged()
+end
+
 local function connect(mapStateToProps, mapDispatchToProps)
     local store = Provider.store
     return function (comp)
@@ -53,28 +61,36 @@ local function connect(mapStateToProps, mapDispatchToProps)
             local obj = comp:new(ownProps)
 
             local dispatchProps = {}
+            local stateProps = {}
             if type(mapDispatchToProps) == 'function' then
                 dispatchProps = mapDispatchToProps(store.dispatch, ownProps)
             end
 
-            if type(mapStateToProps) ~= 'function' then
-                obj.props = assign({}, obj.props, dispatchProps)
-                return obj
+            if type(mapStateToProps) == 'function' then
+                stateProps = mapStateToProps(store.getState(), ownProps)
             end
 
-            local stateProps = mapStateToProps(store.getState(), ownProps)
-            obj.props = assign({}, obj.props, stateProps, dispatchProps)
+            handleNextProps(
+                obj,
+                assign({}, obj.props, stateProps, dispatchProps),
+                true
+            )
+
+            if type(mapStateToProps) ~= 'function' then
+                -- we don't need to handle state changes any more
+                return obj
+            end
 
             local function stateChanged()
                 local nextStateProps = mapStateToProps(store.getState(), ownProps)
                 if isPropsChanged(stateProps, nextStateProps) then
                     local nextProps = assign({}, obj.props, nextStateProps)
-                    obj:reduxPropsWillChange(obj.props, nextProps)
-                    obj.props = nextProps
-                    obj:reduxPropsChanged()
+                    handleNextProps(obj, nextProps, false)
                     stateProps = nextStateProps
                 end
             end
+
+            -- wrap `destroy` function to call `unsubscribe` function
             local destroy = obj.destroy
             local unsubscribe = store.subscribe(stateChanged)
             obj.destroy = function (...)

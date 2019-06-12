@@ -40,7 +40,7 @@ describe('ReduxProps', function ()
                 }
             end
 
-            local index = 1
+            local index = 0
             local Handler = Component:extends()
 
             function Handler:reduxPropsWillChange(prev, next)
