@@ -81,13 +81,13 @@ describe('ReduxProps', function ()
             local index = 0
             local Handler = Component:extends()
 
-            function Handler:reduxPropsWillChange(prev, next)
+            function Handler:propsWillChange(prev, next)
                 print('Handler:reduxPropsWillChange', inspect(prev), inspect(next))
                 print('self.props', inspect(self.props))
                 index = index + 1
             end
 
-            function Handler:reduxPropsChanged()
+            function Handler:propsDidChange()
                 print('Handler:reduxPropsChanged', inspect(self.props))
             end
 
@@ -127,13 +127,13 @@ describe('ReduxProps', function ()
             local index = 0
             local Handler = Component:extends()
 
-            function Handler:reduxPropsWillChange(prev, next)
+            function Handler:propsWillChange(prev, next)
                 print('Handler:reduxPropsWillChange', inspect(prev), inspect(next))
                 print('self.props', inspect(self.props))
                 index = index + 1
             end
 
-            function Handler:reduxPropsChanged()
+            function Handler:propsDidChange()
                 print('Handler:reduxPropsChanged', inspect(self.props))
             end
 

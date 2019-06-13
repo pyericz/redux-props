@@ -24,12 +24,12 @@ function Handler:constructor(props)
 end
 
 -- Define a props will change handler
-function Handler:reduxPropsWillChange(prevProps, nextProps)
+function Handler:propsWillChange(prevProps, nextProps)
     -- handle props will change
 end
 
 -- Define a props changed handler
-function Handler:reduxPropsChanged()
+function Handler:propsDidChange()
     local props = self.props
     -- handle props changed
 end

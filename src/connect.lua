@@ -1,15 +1,16 @@
 local directory = (...):match("(.-)[^%.]+$")
 local Provider = require(directory .. 'provider')
+local Component = require(directory .. 'component')
 
 local function isComponent(comp)
-    if type(comp) ~= 'table' then return false end
-    if type(comp.constructor) ~= 'function' then return false end
-    if type(comp.extends) ~= 'function' then return false end
-    if type(comp.new) ~= 'function' then return false end
-    if type(comp.reduxPropsWillChange) ~= 'function' then return false end
-    if type(comp.reduxPropsChanged) ~= 'function' then return false end
-    if type(comp.destroy) ~= 'function' then return false end
-    return true
+    local mt = getmetatable(comp)
+    while mt ~= nil do
+        if mt == Component then
+            return true
+        end
+        mt = getmetatable(mt)
+    end
+    return false
 end
 
 local function connect(mapStateToProps, mapDispatchToProps)

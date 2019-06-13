@@ -27,9 +27,9 @@ end
 -- private
 local function applyProps(self, props)
     if isPropsChanged(self.props, props) then
-        self:reduxPropsWillChange(self.props, props)
+        self:propsWillChange(self.props, props)
         self.props = props
-        self:reduxPropsChanged()
+        self:propsDidChange()
     end
 end
 
@@ -73,11 +73,11 @@ function Component:new(props)
     return obj
 end
 
-function Component:reduxPropsWillChange(prevProps, nextProps)
+function Component:propsWillChange(prevProps, nextProps)
     suppressWarning(self, prevProps, nextProps)
 end
 
-function Component:reduxPropsChanged()
+function Component:propsDidChange()
     suppressWarning(self)
 end
 
