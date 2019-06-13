@@ -58,10 +58,10 @@ local function connect(mapStateToProps, mapDispatchToProps)
             local unsubscribe = store.subscribe(stateChanged)
             obj.destroy = function (...)
                 unsubscribe()
-                isDestroyed = true
                 if type(destroy) == 'function' then
                     destroy(...)
                 end
+                isDestroyed = true
             end
             return obj
         end
