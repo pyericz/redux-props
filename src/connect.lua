@@ -45,7 +45,9 @@ local function connect(mapStateToProps, mapDispatchToProps)
                 return obj
             end
 
+            local isDestroyed = false
             local function stateChanged()
+                if isDestroyed then return end
                 ownProps = obj:getOwnProps()
                 stateProps = mapStateToProps(store.getState(), ownProps)
                 obj:setReduxProps(stateProps, dispatchProps)
@@ -56,6 +58,7 @@ local function connect(mapStateToProps, mapDispatchToProps)
             local unsubscribe = store.subscribe(stateChanged)
             obj.destroy = function (...)
                 unsubscribe()
+                isDestroyed = true
                 if type(destroy) == 'function' then
                     destroy(...)
                 end
