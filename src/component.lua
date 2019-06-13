@@ -41,6 +41,11 @@ local function suppressWarning()
 end
 
 function Component:constructor(props)
+    local propsType = type(props)
+    assert(propsType == 'table' or propsType == 'nil',
+        string.format('invalid props type (a %s value)', propsType))
+
+    props = assign({}, props)
     self.props = props
     self.ownProps = props
 end
@@ -63,11 +68,6 @@ function Component:new(props)
     setmetatable(obj, self)
     self.__index = self
 
-    local propsType = type(props)
-    assert(propsType == 'table' or propsType == 'nil',
-        string.format('invalid props type (a %s value)', propsType))
-
-    props = assign({}, props)
     obj:constructor(props)
 
     return obj
